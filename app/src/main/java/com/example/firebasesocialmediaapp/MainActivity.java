@@ -1,0 +1,120 @@
+package com.example.firebasesocialmediaapp;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.widget.Toolbar;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText edtEmail, edtPassword, edtUsername;
+    private Button btnSignUp, btnSignIn;
+
+    private FirebaseAuth mAuth;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        FirebaseApp.initializeApp(this);
+
+        edtEmail = findViewById(R.id.edtEmail);
+        edtUsername = findViewById(R.id.edtUsername);
+        edtPassword = findViewById(R.id.edtPassword);
+        btnSignIn = findViewById(R.id.btnSignIn);
+        btnSignUp = findViewById(R.id.btnSignUp);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SignUp();
+
+            }
+        });
+
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SignIn();
+
+            }
+        });
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            //Transition to Next
+            transitionToSocialMediaActivity();
+        }
+
+    }
+
+    public void SignUp(){
+        mAuth.createUserWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                if(task.isSuccessful()){
+
+                    Toast.makeText(MainActivity.this, "Signing Up Successful", Toast.LENGTH_LONG).show();
+                    transitionToSocialMediaActivity();
+
+                }else{
+
+                    Toast.makeText(MainActivity.this, "Signing Up failed", Toast.LENGTH_LONG).show();
+
+                }
+
+            }
+        });
+    }
+
+
+    public void SignIn(){
+
+        mAuth.signInWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+
+                    Toast.makeText(MainActivity.this, "Signing In Successful", Toast.LENGTH_LONG).show();
+                    transitionToSocialMediaActivity();
+
+                } else{
+
+                    Toast.makeText(MainActivity.this, "Signing In failed", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        });
+
+    }
+
+    private void transitionToSocialMediaActivity(){
+
+        Intent intent = new Intent(this, SocialMediaActivity.class);
+        startActivity(intent);
+
+    }
+}
