@@ -17,6 +17,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
 
                     Toast.makeText(MainActivity.this, "Signing Up Successful", Toast.LENGTH_LONG).show();
+
+                    FirebaseDatabase.getInstance().getReference().child("my_users").child(task.getResult().getUser().getUid()).child("username").setValue(edtUsername.getText().toString());
+
                     transitionToSocialMediaActivity();
 
                 }else{
