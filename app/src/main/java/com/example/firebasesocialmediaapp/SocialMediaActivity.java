@@ -1,12 +1,15 @@
 package com.example.firebasesocialmediaapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,6 +31,7 @@ public class SocialMediaActivity extends AppCompatActivity {
     private Button btnCreatePost;
     private EditText edtDes;
     private ListView usersListView;
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,4 +113,31 @@ public class SocialMediaActivity extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode==1000 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            selectImage();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==1000 && resultCode == RESULT_OK && data != null){
+
+            Uri chosenImageData = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), chosenImageData);
+                postImageView.setImageBitmap(bitmap);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
+
