@@ -17,6 +17,7 @@ package com.example.firebasesocialmediaapp;
         import android.view.Menu;
         import android.view.MenuItem;
         import android.view.View;
+        import android.widget.AdapterView;
         import android.widget.ArrayAdapter;
         import android.widget.Button;
         import android.widget.EditText;
@@ -38,7 +39,7 @@ package com.example.firebasesocialmediaapp;
         import java.util.ArrayList;
         import java.util.UUID;
 
-public class SocialMediaActivity extends AppCompatActivity {
+public class SocialMediaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private FirebaseAuth mAuth;
     private ImageView postImageView;
@@ -49,6 +50,7 @@ public class SocialMediaActivity extends AppCompatActivity {
     private String imageIdentifier;
     private ArrayList<String> arrayList;
     private ArrayAdapter adapter;
+    private ArrayList<String> uids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +62,11 @@ public class SocialMediaActivity extends AppCompatActivity {
         btnCreatePost = findViewById(R.id.btnCreatePost);
         edtDes = findViewById(R.id.edtDes);
         usersListView = findViewById(R.id.usersListView);
+        usersListView.setOnItemClickListener(this);
         arrayList = new ArrayList<>();
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayList);
 
+        uids = new ArrayList<>();
         usersListView.setAdapter(adapter);
 
         postImageView.setOnClickListener(new View.OnClickListener() {
@@ -195,6 +199,7 @@ public class SocialMediaActivity extends AppCompatActivity {
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
+                            uids.add(dataSnapshot.getKey());
                             String username = (String) dataSnapshot.child("username").getValue();
                             arrayList.add(username);
                             adapter.notifyDataSetChanged();
@@ -231,5 +236,11 @@ public class SocialMediaActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+
+    }
 }
 
