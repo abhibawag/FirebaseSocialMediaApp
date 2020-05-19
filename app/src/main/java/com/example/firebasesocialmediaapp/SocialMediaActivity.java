@@ -25,8 +25,10 @@ package com.example.firebasesocialmediaapp;
         import android.widget.ListView;
         import android.widget.Toast;
 
+        import com.google.android.gms.tasks.OnCompleteListener;
         import com.google.android.gms.tasks.OnFailureListener;
         import com.google.android.gms.tasks.OnSuccessListener;
+        import com.google.android.gms.tasks.Task;
         import com.google.firebase.auth.FirebaseAuth;
         import com.google.firebase.database.ChildEventListener;
         import com.google.firebase.database.DataSnapshot;
@@ -37,6 +39,7 @@ package com.example.firebasesocialmediaapp;
 
         import java.io.ByteArrayOutputStream;
         import java.util.ArrayList;
+        import java.util.HashMap;
         import java.util.UUID;
 
 public class SocialMediaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -51,6 +54,7 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     private ArrayList<String> arrayList;
     private ArrayAdapter adapter;
     private ArrayList<String> uids;
+    private String imageDownloadLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +231,16 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
                         }
                     });
 
+                    taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+
+                            if(task.isSuccessful()){
+                                imageDownloadLink = task.getResult().toString();
+                            }
+                        }
+                    });
+
                 }
             });
         }else{
@@ -239,6 +253,12 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+        HashMap<String, String> dataMap = new HashMap<>();
+        dataMap.put("fromWhom", FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        dataMap.put("imageIdentifier", imageIdentifier);
+        dataMap.put("imageLink", imageDownloadLink);
+        dataMap.put("Des", edtDes.getText().toString());
+        FirebaseDatabase.getInstance().getReference().child("my_users").child(uids.get(position)).child("received_posts").push().setValue(dataMap);
 
 
     }
