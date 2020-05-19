@@ -61,7 +61,9 @@ public class SocialMediaActivity extends AppCompatActivity {
         edtDes = findViewById(R.id.edtDes);
         usersListView = findViewById(R.id.usersListView);
         arrayList = new ArrayList<>();
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayList);
+
+        usersListView.setAdapter(adapter);
 
         postImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,36 +191,36 @@ public class SocialMediaActivity extends AppCompatActivity {
                     Toast.makeText(SocialMediaActivity.this, "Uploaded to server", Toast.LENGTH_LONG).show();
                     edtDes.setVisibility(View.VISIBLE);
 
-//                    FirebaseDatabase.getInstance().getReference().child("my_users").addChildEventListener(new ChildEventListener() {
-//                        @Override
-//                        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                            String username = (String) dataSnapshot.child("username").getValue();
-//                            arrayList.add(username);
-//                            adapter.notifyDataSetChanged();
-//
-//                        }
-//
-//                        @Override
-//                        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                        }
-//                    });
+                    FirebaseDatabase.getInstance().getReference().child("my_users").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                            String username = (String) dataSnapshot.child("username").getValue();
+                            arrayList.add(username);
+                            adapter.notifyDataSetChanged();
+
+                        }
+
+                        @Override
+                        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
 
                 }
             });
