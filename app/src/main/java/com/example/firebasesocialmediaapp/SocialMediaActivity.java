@@ -1,28 +1,42 @@
 package com.example.firebasesocialmediaapp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+        import androidx.annotation.NonNull;
+        import androidx.annotation.Nullable;
+        import androidx.appcompat.app.AppCompatActivity;
+        import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
+        import android.Manifest;
+        import android.content.Intent;
+        import android.content.pm.PackageManager;
+        import android.graphics.Bitmap;
+        import android.graphics.drawable.BitmapDrawable;
+        import android.net.Uri;
+        import android.os.Build;
+        import android.os.Bundle;
+        import android.provider.MediaStore;
+        import android.view.Menu;
+        import android.view.MenuItem;
+        import android.view.View;
+        import android.widget.ArrayAdapter;
+        import android.widget.Button;
+        import android.widget.EditText;
+        import android.widget.ImageView;
+        import android.widget.ListView;
+        import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
+        import com.google.android.gms.tasks.OnFailureListener;
+        import com.google.android.gms.tasks.OnSuccessListener;
+        import com.google.firebase.auth.FirebaseAuth;
+        import com.google.firebase.database.ChildEventListener;
+        import com.google.firebase.database.DataSnapshot;
+        import com.google.firebase.database.DatabaseError;
+        import com.google.firebase.database.FirebaseDatabase;
+        import com.google.firebase.storage.FirebaseStorage;
+        import com.google.firebase.storage.UploadTask;
+
+        import java.io.ByteArrayOutputStream;
+        import java.util.ArrayList;
+        import java.util.UUID;
 
 public class SocialMediaActivity extends AppCompatActivity {
 
@@ -32,6 +46,9 @@ public class SocialMediaActivity extends AppCompatActivity {
     private EditText edtDes;
     private ListView usersListView;
     private Bitmap bitmap;
+    private String imageIdentifier;
+    private ArrayList<String> arrayList;
+    private ArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +60,8 @@ public class SocialMediaActivity extends AppCompatActivity {
         btnCreatePost = findViewById(R.id.btnCreatePost);
         edtDes = findViewById(R.id.edtDes);
         usersListView = findViewById(R.id.usersListView);
+        arrayList = new ArrayList<>();
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
 
         postImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +76,7 @@ public class SocialMediaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
+                uploadImageToServer();
 
             }
         });
@@ -77,7 +96,7 @@ public class SocialMediaActivity extends AppCompatActivity {
         switch (item.getItemId()){
 
             case R.id.logoutItem:
-                   logout();
+                logout();
                 break;
 
         }
@@ -139,5 +158,76 @@ public class SocialMediaActivity extends AppCompatActivity {
 
         }
     }
+
+    private void uploadImageToServer(){
+
+
+        if(bitmap != null) {
+
+            // Get the data from an ImageView as bytes
+            postImageView.setDrawingCacheEnabled(true);
+            postImageView.buildDrawingCache();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] data = baos.toByteArray();
+
+            imageIdentifier = UUID.randomUUID() + ".png";
+
+            UploadTask uploadTask = FirebaseStorage.getInstance().getReference().child("my_images").child(imageIdentifier).putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Toast.makeText(SocialMediaActivity.this, exception.toString(), Toast.LENGTH_LONG).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                    // ...
+
+                    Toast.makeText(SocialMediaActivity.this, "Uploaded to server", Toast.LENGTH_LONG).show();
+                    edtDes.setVisibility(View.VISIBLE);
+
+//                    FirebaseDatabase.getInstance().getReference().child("my_users").addChildEventListener(new ChildEventListener() {
+//                        @Override
+//                        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                            String username = (String) dataSnapshot.child("username").getValue();
+//                            arrayList.add(username);
+//                            adapter.notifyDataSetChanged();
+//
+//                        }
+//
+//                        @Override
+//                        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                        }
+//                    });
+
+                }
+            });
+        }else{
+
+            Toast.makeText(SocialMediaActivity.this, "Please Select Image", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 }
 
