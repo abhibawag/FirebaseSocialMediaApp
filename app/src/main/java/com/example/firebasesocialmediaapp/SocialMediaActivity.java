@@ -108,6 +108,10 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
             case R.id.logoutItem:
                 logout();
                 break;
+            case R.id.viewSentPosts:
+                Intent intent = new Intent(SocialMediaActivity.this, ViewPostsActivity.class);
+                startActivity(intent);
+                break;
 
         }
 
@@ -258,7 +262,14 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
         dataMap.put("imageIdentifier", imageIdentifier);
         dataMap.put("imageLink", imageDownloadLink);
         dataMap.put("Des", edtDes.getText().toString());
-        FirebaseDatabase.getInstance().getReference().child("my_users").child(uids.get(position)).child("received_posts").push().setValue(dataMap);
+        FirebaseDatabase.getInstance().getReference().child("my_users").child(uids.get(position)).child("received_posts").push().setValue(dataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(SocialMediaActivity.this, "Photo Sent", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
 
     }

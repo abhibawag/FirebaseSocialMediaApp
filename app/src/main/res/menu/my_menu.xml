@@ -6,4 +6,8 @@
         android:title="Log Out"
         app:showAsAction="always"/>
 
+    <item android:id="@+id/viewSentPosts"
+        android:title="Sent Posts"
+        app:showAsAction="always"/>
+
 </menu>
